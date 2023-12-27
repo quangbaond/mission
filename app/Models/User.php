@@ -88,4 +88,9 @@ class User extends Authenticatable implements JWTSubject, FilamentUser
     {
         return $this->hasMany(UserMission::class, 'user_id', 'id');
     }
+
+    public function withDraw(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(WithDraw::class, 'user_id', 'id');
+    }
 }

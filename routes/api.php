@@ -30,4 +30,6 @@ Route::prefix('v1')->middleware(['auth:api'])->group(function () {
     Route::get('/profile', [UserController::class, 'profile']);
     Route::get('/missions', [\App\Http\Controllers\MissionController::class, 'index']);
     Route::post('/missions/do-task', [\App\Http\Controllers\MissionController::class, 'doTask']);
+    Route::post('/withdraw', [\App\Http\Controllers\UserController::class, 'withDraw']);
+    Route::get('/withdraw', [\App\Http\Controllers\UserController::class, 'getWithDraw']);
 });

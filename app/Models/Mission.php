@@ -24,8 +24,6 @@ class Mission extends Model
         'updated_at',
     ];
 
-
-
     public function user()
     {
         return $this->belongsToMany(User::class, 'user_mission', 'mission_id', 'user_id')->withTimestamps();

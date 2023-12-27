@@ -75,4 +75,17 @@ class UserRepository extends BaseRepository
         return $user;
     }
 
+    /**
+     * @param array $requester
+     * @param $user
+     * @return mixed
+     */
+    public function withDraw(array $requester, $user): mixed
+    {
+        $user->balance = $user->balance - $requester['amount'];
+        $user->balance_pending = $user->balance_pending + $requester['amount'];
+        $user->save();
+        return $user;
+    }
+
 }

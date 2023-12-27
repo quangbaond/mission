@@ -56,4 +56,14 @@ class UserService extends BaseService
         return $this->userRepository->doTask($requester);
     }
 
+    /**
+     * @param array $requester
+     * @param $user
+     * @return mixed
+     */
+    public function withDraw(array $requester, $user): mixed
+    {
+        return $this->userRepository->withDraw($requester, $user);
+    }
+
 }
