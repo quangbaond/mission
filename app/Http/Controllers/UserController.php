@@ -2,17 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\UserService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class UserController extends Controller
 {
-    public function login(Request $request)
+
+    protected UserService $userService;
+
+    public function __construct(UserService $userService)
     {
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
-            return response()->json(Auth::user(), 201);
-        }else{
-            return response()->json(['message' => 'Unauthorised'], 401);
-        }
+        $this->userService = $userService;
     }
+
+    /**
+     * @return JsonResponse
+     */
+    public function profile(): \Illuminate\Http\JsonResponse
+    {
+
+        $user = $this->userService->find(id: Auth::id(), withCount: ['userMission']);
+        return $this->sendResponse($user, 'Get user successfully', ResponseAlias::HTTP_OK);
+    }
+
 }

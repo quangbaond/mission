@@ -20,13 +20,17 @@ class BaseService
     {
         $this->repository = $repository;
     }
+
     /**
-     * @param $id
+     * @param int $id
+     * @param array|string $columns
+     * @param array|null $with
+     * @param array|string|null $withCount
      * @return Model
      */
-    public function find(int $id) :Model
+    public function find(int $id, array|string $columns = ['*'] , array $with = null, array|string|null $withCount = null) :Model
     {
-        return $this->repository->find($id);
+        return $this->repository->find($id, $columns, $with, $withCount);
     }
 
     /**
@@ -57,6 +61,22 @@ class BaseService
     public function create(array $data) : Model
     {
         return $this->repository->create($data);
+    }
+
+    /**
+     * @throws ExceptionAlias
+     */
+    public function pagination(array $requester = [], array $columnCanSearchKeyword = ['*'], int $limit = PAGE_SIZE): array|\Illuminate\Database\Eloquent\Collection|\Illuminate\Pagination\LengthAwarePaginator
+    {
+        return $this->repository->pagination(limit: $limit, requester: $requester, columnCanSearchKeyword: $columnCanSearchKeyword);
+    }
+
+    /**
+     * @throws ExceptionAlias
+     */
+    public function withCount($requester = [], $columnCanSearchKeyword = ['*']): int
+    {
+        return $this->repository->withCount($requester, $columnCanSearchKeyword);
     }
 }
 

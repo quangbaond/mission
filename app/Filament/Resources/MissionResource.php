@@ -52,6 +52,15 @@ class MissionResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->placeholder(__('Exp')),
+                        Forms\Components\Select::make('type')
+                            ->options([
+                                0 => __('Url sort'),
+                                1 => __('Download app'),
+                            ])
+                            ->default(0)
+                            ->placeholder(__('Type')),
+                        Forms\Components\Checkbox::make('is_public')
+                            ->default(true)
                     ])
                     ->columns(1)
             ]);

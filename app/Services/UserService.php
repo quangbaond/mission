@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin;
+namespace App\Services;
 
 use App\Services\BaseService;
 use App\Repositories\Eloquent\UserRepository;
@@ -28,7 +28,7 @@ class UserService extends BaseService
 
     /**
      * @param array $requester
-     * @return LengthAwarePaginator
+     * @return array|Collection|LengthAwarePaginator
      * @throws Exception
      */
     public function search(array $requester = []): array|Collection|LengthAwarePaginator
@@ -44,6 +44,16 @@ class UserService extends BaseService
     public function create(array $data): \Illuminate\Database\Eloquent\Model
     {
         return $this->userRepository->create($data);
+    }
+
+    public function userMission(array $requester = [], bool $count = true): Collection|int|array
+    {
+        return $this->userRepository->userMission($requester, $count);
+    }
+
+    public function doTask(array $requester = [])
+    {
+        return $this->userRepository->doTask($requester);
     }
 
 }

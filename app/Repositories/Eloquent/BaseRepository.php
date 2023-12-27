@@ -36,10 +36,10 @@ abstract class BaseRepository
      * @param int $limit
      * @param array $requester
      * @param array $columnCanSearchKeyword
-     * @return Builder[]|Collection
+     * @return array|Collection|LengthAwarePaginator
      * @throws Exception
      */
-    public function pagination(int $limit = PAGINATE_DEFAULT, array $requester = [], array $columnCanSearchKeyword = []): array|Collection|LengthAwarePaginator
+    public function pagination(int $limit = PAGE_SIZE, array $requester = [], array $columnCanSearchKeyword = []): array|Collection|LengthAwarePaginator
     {
         return isset($requester['all']) && $requester['all']
             ? $this->search($requester, $columnCanSearchKeyword)->get()
@@ -70,6 +70,7 @@ abstract class BaseRepository
             'select' => $this->querySelect(query: $query, columns: $value),
             'orderByColumn' => collect($value)->each(callback: fn($column, $k) => $this->queryOrderByColumn(column: $column, direction: $requester['orderBy'], query: $query)),
             'orderBy', 'page', 'limit', 'all' => $query,
+            'with' => $value ? $query->with($value) : $query,
             default => !is_null($value) ? $this->queryDefault(column: $key, value: $value, query: $query) : $query,
         });
         return $query;
@@ -138,11 +139,22 @@ abstract class BaseRepository
     /**
      * @param int $id
      * @param array $columns
+     * @param array|string|null $with
+     * @param array|string|null $withCount
      * @return Model|Collection|Builder|array|null
      */
-    public function find(int $id, array $columns = ['*']): Model|\Illuminate\Database\Eloquent\Collection|Builder|array|null
+    public function find(int $id, array $columns = ['*'], array|string|null $with = null, array|string|null $withCount = null): Model|\Illuminate\Database\Eloquent\Collection|Builder|array|null
     {
-        return $this->model->query()->findOrFail($id, $columns);
+        $query = $this->model->query();
+
+        if ($with) {
+            $query->with($with);
+        }
+
+        if ($withCount) {
+            $query->withCount($withCount);
+        }
+        return $query->findOrFail($id, $columns);
     }
 
     /**
@@ -210,5 +222,13 @@ abstract class BaseRepository
     public function uploadFileStorage(string $path, string $file, string $disk = 'public'): string
     {
         return Storage::disk($disk)->putFile($path, $file);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function withCount($requester = [], $columnCanSearchKeyword = ['*']): int
+    {
+        return $this->search(requester: $requester, columnCanSearchKeyword: $columnCanSearchKeyword)->count();
     }
 }

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('url')->nullable()->default(null);
             $table->boolean('is_active')->default(true);
             $table->tinyInteger('type')->default(0)->comment('0:url sort, 1: download app');
+            $table->boolean('is_public')->default(false);
             $table->bigInteger('reward')->default(0);
             $table->bigInteger('exp')->default(0);
             $table->timestamps();

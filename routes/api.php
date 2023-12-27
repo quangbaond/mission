@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,4 +21,13 @@ use Illuminate\Support\Facades\Route;
 
 // login
 
-Route::post('/auth/login', [App\Http\Controllers\UserController::class, 'login']);
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [\App\Http\Controllers\Auth\Api\LoginController::class, 'login']);
+    Route::post('/register', [\App\Http\Controllers\Auth\Api\RegisterController::class, 'register']);
+});
+
+Route::prefix('v1')->middleware(['auth:api'])->group(function () {
+    Route::get('/profile', [UserController::class, 'profile']);
+    Route::get('/missions', [\App\Http\Controllers\MissionController::class, 'index']);
+    Route::post('/missions/do-task', [\App\Http\Controllers\MissionController::class, 'doTask']);
+});
