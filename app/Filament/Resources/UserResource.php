@@ -79,16 +79,32 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('phone')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('phone_verified_at')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('address')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('code')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\BooleanColumn::make('is_admin')
                     ->label(__('Is Admin'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('balance')
+                    ->sortable()
                     ->formatStateUsing(fn($state) => '$' . number_format($state, 2)),
                 Tables\Columns\TextColumn::make('balance_pending')
+                    ->sortable()
                     ->formatStateUsing(fn($state) => '$' . number_format($state, 2)),
                 Tables\Columns\TextColumn::make('balance_withdraw')
+                    ->sortable()
                     ->formatStateUsing(fn($state) => '$' . number_format($state, 2)),
                 Tables\Columns\TextColumn::make('balance_deposit')
+                    ->sortable()
                     ->formatStateUsing(fn($state) => '$' . number_format($state, 2)),
             ])
             ->filters([
