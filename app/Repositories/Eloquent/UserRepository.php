@@ -68,10 +68,9 @@ class UserRepository extends BaseRepository
         $user = $this->model->query()->find($requester['user_id']);
         $user->mission()->attach($requester['mission_id']);
         // cập nhật lại số dư của user
-        $user->balance = $user->balance + $requester['reward'];
-        $user->balance_deposit = $user->balance_deposit + $requester['reward'];
-
-        $user->save();
+//        $user->balance = $user->balance + $requester['reward'];
+//        $user->balance_deposit = $user->balance_deposit + $requester['reward'];
+//        $user->save();
         return $user;
     }
 

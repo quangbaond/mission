@@ -90,24 +90,26 @@ abstract class BaseRepository
     }
 
     /**
-     * @param string $column
-     * @param string $value
-     * @param Builder $query
+     * @param string|array $column
+     * @param string|null $value
+     * @param Builder|null $query
      * @return Builder
      * @throws Exception
      */
-    public function queryDefault(string $column, string $value, Builder $query): Builder
+    public function queryDefault(string|array $column, string|null $value, Builder|null $query): Builder
     {
-        // if not exit $column throw error
-        if (!in_array($column, $this->model->getFillable())) {
-           return !env('APP_DEBUG')
-               ? $query
-               : throw new Exception(message: 'Column ' . $column . ' not exist in table ' . $this->model->getTable(), code: 500);
+        if(!$query) {
+            $query = $this->model->query();
         }
 
-        return $query->when(!is_null($value), function ($q) use ($column, $value) {
+
+        if (is_array($column)) {
+            return $query->where($column);
+        }
+
+        return $query->when(!is_null($value), callback: function ($q) use ($column, $value) {
             return $q->where($column, $value);
-        }, function ($q) use ($column) {
+        }, default: function ($q) use ($column) {
             return $q->whereNull($column);
         });
 

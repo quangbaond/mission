@@ -16,11 +16,17 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('phone')->unique()->nullable();
+            $table->timestamp('phone_verified_at')->nullable();
+            $table->string('address')->nullable();
+            $table->string('avatar')->nullable();
+            $table->string('code');
             $table->boolean('is_admin')->default(false);
             $table->bigInteger('balance')->default(0);
             $table->bigInteger('balance_pending')->default(0);
             $table->bigInteger('balance_withdraw')->default(0);
             $table->bigInteger('balance_deposit')->default(0);
+            $table->bigInteger('balance_introduce')->default(0);
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

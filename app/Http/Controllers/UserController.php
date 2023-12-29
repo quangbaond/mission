@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\IntroduceService;
 use App\Services\UserService;
 use App\Services\WithDrawService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class UserController extends Controller
@@ -16,10 +18,13 @@ class UserController extends Controller
 
     protected WithDrawService $withDrawService;
 
-    public function __construct(UserService $userService, WithDrawService $withDrawService)
+    protected IntroduceService $introduceService;
+
+    public function __construct(UserService $userService, WithDrawService $withDrawService, IntroduceService $introduceService)
     {
         $this->userService = $userService;
         $this->withDrawService = $withDrawService;
+        $this->introduceService = $introduceService;
     }
 
     /**
@@ -65,4 +70,56 @@ class UserController extends Controller
         return $this->sendResponse($withDraw, 'Get user successfully', ResponseAlias::HTTP_OK);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Exception
+     */
+
+    public function updateProfile(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:' . FORM_INPUT_MAX_LENGTH],
+            'phone' => ['nullable', 'string', 'max:' . FORM_INPUT_MAX_LENGTH, 'unique:users,phone,' . Auth::id()],
+            'address' =>  ['nullable', 'string', 'max:' . FORM_INPUT_MAX_LENGTH],
+            'email' => ['required', 'string', 'email', 'max:' . FORM_INPUT_MAX_LENGTH],
+            'password' => ['nullable', 'string', 'confirmed'],
+            'password_confirmation' => ['nullable', 'string'],
+            'password_old' => ['nullable', 'string'],
+        ],[
+            'name.required' => 'Vui lòng nhập họ tên',
+            'name.max' => 'Họ tên không được vượt quá ' . FORM_INPUT_MAX_LENGTH . ' ký tự',
+            'phone.max' => 'Số điện thoại không được vượt quá ' . FORM_INPUT_MAX_LENGTH . ' ký tự',
+            'phone.unique' => 'Số điện thoại đã tồn tại',
+            'address.max' => 'Địa chỉ không được vượt quá ' . FORM_INPUT_MAX_LENGTH . ' ký tự',
+            'email.required' => 'Vui lòng nhập email',
+            'email.email' => 'Email không đúng định dạng',
+            'email.max' => 'Email không được vượt quá ' . FORM_INPUT_MAX_LENGTH . ' ký tự',
+            'password.confirmed' => 'Mật khẩu không khớp',
+
+        ]);
+
+        if ($request->password_old && !Hash::check($request->password_old, Auth::user()->password)) {
+            return $this->sendResponse([],'Mật khẩu cũ không đúng', ResponseAlias::HTTP_BAD_REQUEST);
+        }
+        if($request->phone && !Auth::user()->phone_verified_at){
+            $request->merge(['phone_verified_at' => now()]);
+        }
+
+        $this->userService->update($request->all(), Auth::id());
+        $user = $this->userService->find(id: Auth::id());
+        return $this->sendResponse($user, 'Update user successfully', ResponseAlias::HTTP_OK);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function getIntroduce(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user = $this->userService->find(id: Auth::id());
+        $introduceTotal = $user->introduce()->count();
+
+        $introduceVerifyTotal = $user->introduce()->whereHas('introducedVerified')->count();
+        return $this->sendResponse(['introduceTotal' => $introduceTotal, 'introduceVerifyTotal' => $introduceVerifyTotal], 'Get introduce successfully', ResponseAlias::HTTP_OK);
+    }
 }

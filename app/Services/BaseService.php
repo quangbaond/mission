@@ -33,6 +33,19 @@ class BaseService
         return $this->repository->find($id, $columns, $with, $withCount);
     }
 
+    // find by column
+
+    /**
+     * @param array|string $columns
+     * @return \Illuminate\Database\Eloquent\Builder
+     * @throws ExceptionAlias
+     */
+    public function findBy(array|string $columns) : \Illuminate\Database\Eloquent\Builder
+    {
+        return $this->repository->queryDefault($columns, null, null);
+    }
+
+
     /**
      * @param array $data
      * @param int $id

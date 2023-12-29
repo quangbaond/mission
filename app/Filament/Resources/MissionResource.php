@@ -44,7 +44,6 @@ class MissionResource extends Resource
                             ->url()
                             ->placeholder(__('Url')),
                         Forms\Components\TextInput::make('reward')
-                            ->mask(RawJs::make('$money($input)'))
                             ->default(0)
                             ->numeric()
                             ->placeholder(__('Reward')),

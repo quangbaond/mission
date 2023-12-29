@@ -24,11 +24,16 @@ class User extends Authenticatable implements JWTSubject, FilamentUser
         'name',
         'email',
         'password',
+        'phone',
+        'address',
+        'avatar',
+        'code',
         'is_admin',
         'balance',
         'balance_pending',
         'balance_withdraw',
         'balance_deposit',
+        'balance_introduce',
     ];
 
     /**
@@ -49,6 +54,7 @@ class User extends Authenticatable implements JWTSubject, FilamentUser
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'phone_verified_at' => 'datetime',
     ];
 
     /**
@@ -68,6 +74,17 @@ class User extends Authenticatable implements JWTSubject, FilamentUser
     public function getJWTIdentifier(): mixed
     {
         return $this->getKey();
+    }
+
+    // auto generate code when create user
+
+    protected static function boot(): void
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            $code = substr(md5(rand()), 0, 7);
+            $model->code = $code;
+        });
     }
 
     /**
@@ -93,4 +110,22 @@ class User extends Authenticatable implements JWTSubject, FilamentUser
     {
         return $this->hasMany(WithDraw::class, 'user_id', 'id');
     }
+
+    public function introduce(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Introduce::class, 'user_id', 'id');
+    }
+
+    public function introduced(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Introduce::class, 'introduced_id', 'id');
+    }
+
+    public function introducedVerified(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        // where user phone verified at is not null
+        return $this->hasMany(Introduce::class, 'introduced_id', 'id')->where('phone_verified_at', '!=', null);
+
+    }
+
 }
